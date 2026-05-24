@@ -1,0 +1,84 @@
+﻿@using AppointmentManagementSystem.ViewModels
+@using AppointmentManagementSystem.ViewModels.Appointments
+@{
+    ViewData["Title"] = "Patient Appointments";
+}
+
+@model PatientDashboardViewModel
+
+<section class="py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1">Patient Dashboard</h3>
+            <p class="text-muted mb-0">Overview of your appointments</p>
+        </div>
+
+        <a asp-controller="Appointment"
+           asp-action="PatientAppointments"
+           class="btn btn-primary">
+            View Appointments
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <a asp-controller="Appointment"
+               asp-action="Index"
+               class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Total Appointments</p>
+                                <h3 class="fw-bold mb-0">@Model.TotalAppointments</h3>
+                            </div>
+                            <i class="bi bi-calendar-check text-primary fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Appointment"
+               asp-action="Index"
+               asp-route-filter="upcoming"
+               class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Upcoming Appointments</p>
+                                <h3 class="fw-bold mb-0">@Model.UpcomingAppointments</h3>
+                            </div>
+                            <i class="bi bi-clock-history text-info fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Appointment"
+               asp-action="Index"
+               asp-route-filter="approved"
+               class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Approved Appointments</p>
+                                <h3 class="fw-bold mb-0">@Model.ApprovedAppointments</h3>
+                            </div>
+                            <i class="bi bi-check-circle text-success fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+</section>

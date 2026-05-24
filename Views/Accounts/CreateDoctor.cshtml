@@ -1,0 +1,131 @@
+﻿@using AppointmentManagementSystem.ViewModels.Accounts
+@model DoctorAddViewModel
+
+@{
+    ViewData["Title"] = "Add Doctor";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <div class="card  rounded-4">
+
+                <div class="card-header  p-4 rounded-top-4">
+                    <h3 class="mb-0 ">
+                        <i class="bi bi-person-plus-fill me-2"></i>
+                        Add Doctor
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-action="CreateDoctor" asp-controller="Accounts" method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger ">
+                        </div>
+
+                        <!-- Name -->
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-semibold"></label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+
+                                <input asp-for="Name"
+                                       class="form-control form-control-lg"
+                                       placeholder="Enter doctor's name" />
+                            </div>
+
+                            <span asp-validation-for="Name"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label fw-semibold"></label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+
+                                <input asp-for="Email"
+                                       class="form-control form-control-lg"
+                                       placeholder="doctor@example.com" />
+                            </div>
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <!-- Qualification -->
+                        <div class="mb-4">
+                            <label asp-for="Qualification"
+                                   class="form-label fw-semibold"></label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </span>
+
+                                <input asp-for="Qualification"
+                                       class="form-control form-control-lg"
+                                       placeholder="MBBS, FCPS, MD..." />
+                            </div>
+
+                            <span asp-validation-for="Qualification"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <!-- Specialization -->
+                        <div class="mb-4">
+                            <label asp-for="Specialization"
+                                   class="form-label fw-semibold"></label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-heart-pulse-fill"></i>
+                                </span>
+
+                                <input asp-for="Specialization"
+                                       class="form-control form-control-lg"
+                                       placeholder="Cardiologist, Neurologist..." />
+                            </div>
+
+                            <span asp-validation-for="Specialization"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+
+                            <a asp-action="Index"
+                               class="btn btn-light btn-lg px-4">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-lg px-4">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Save Doctor
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

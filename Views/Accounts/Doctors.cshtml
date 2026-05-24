@@ -1,0 +1,109 @@
+﻿@using AppointmentManagementSystem.ViewModels.Appointments
+@model IEnumerable<DoctorViewModel>
+
+<section class="py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Doctors</h2>
+
+            <p class="text-muted mb-0">
+                List of all registered doctors
+            </p>
+        </div>
+
+
+        <a class="btn btn-primary" asp-controller="Accounts" asp-action="CreateDoctor">
+            <i class="bi bi-plus-circle"></i> Add Doctor
+        </a>
+
+    </div>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Qualification</th>
+                            <th>Specialization</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Any())
+                        {
+                            int count = 1;
+
+                            foreach (var doctor in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @count
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-2"
+                                                 style="width:40px;height:40px;">
+
+                                                <i class="bi bi-heart-pulse"></i>
+                                            </div>
+
+                                            <span>
+                                                Dr. @doctor.Name
+                                            </span>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        @doctor.Qualification
+                                    </td>
+
+                                    <td>
+                                        @doctor.Specialization
+                                    </td>
+
+                                </tr>
+
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="4"
+                                    class="text-center text-muted py-4">
+
+                                    No doctors found.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>

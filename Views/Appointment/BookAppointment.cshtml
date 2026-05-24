@@ -1,0 +1,231 @@
+﻿@using System.Security.Claims
+@using AppointmentManagementSystem.ViewModels.Appointments
+@model DoctorViewModel
+@inject IHttpContextAccessor HttpContextAccessor
+<div class="container mt-5">
+
+    <div class="card shadow border-0 mb-4">
+        <div class="card-body">
+
+            <h3>@Model.Name</h3>
+
+            <p>
+                <strong>Qualification:</strong>
+                @if (!string.IsNullOrEmpty(@Model.Qualification))
+                {
+                    <span>@Model.Qualification</span>
+                }
+                else
+                {
+                    <span>N/A</span>
+                }
+            </p>
+
+            <p>
+                <strong>Specialization:</strong>
+                @if (!string.IsNullOrEmpty(@Model.Specialization))
+                {
+                    <span>@Model.Specialization</span>
+                }
+                else
+                {
+                    <span>N/A</span>
+                }
+            </p>
+
+        </div>
+    </div>
+
+    <form
+          method="post">
+
+        <input type="hidden"
+               name="DoctorId"
+               value="@Model.Id" />
+        <input type="hidden"
+               name="PatientId"
+               value="@HttpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier).Value" />
+
+        <div class="card shadow border-0">
+
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    Book Appointment
+                </h4>
+            </div>
+
+            <div class="card-body">
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Title
+                    </label>
+
+                    <input name="Title"
+                           type="text"
+                           id="Title"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Description
+                    </label>
+
+                    <textarea name="Description"
+                              class="form-control"
+                              id="Description"
+                              rows="4"
+                              required></textarea>
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Start Date & Time
+                    </label>
+
+                    <input 
+                           id="StartDate"
+                           name="StartDate"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div>
+                    <label class="form-label">Duration</label>
+                    @Html.DropDownList("DurationId", new SelectList(ViewBag.Durations, "Value", "Text"), new { @class = "form-control select2", @id = "Duration" })
+                </div>
+
+                <div id="validationMessage"
+                     class="alert alert-danger d-none"></div>
+
+                <button type="submit"
+                        class="btn btn-primary w-100 mt-3">
+                    Book Appointment
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+             $(document).ready(function () {
+
+            $('#StartDate').datetimepicker({
+                format: 'Y-m-d H:i',
+                step: 30,
+                minDate: 0,
+                minTime: '09:00',
+                maxTime: '18:00'
+            });
+
+            $('form').submit(function (e) {
+
+                e.preventDefault();
+
+                        const startDate =  moment( $('#StartDate').val()).format('YYYY-MM-DDTHH:mm')
+
+       
+
+                const title = $('#Title').val();
+                const description = $('#Description').val();
+
+                const duration = parseInt($('#Duration').val());
+
+                const doctorId = $('input[name="DoctorId"]').val();
+                const patientId = $('input[name="PatientId"]').val();
+
+                $('#validationMessage').addClass('d-none');
+
+                // Minimum 30 minutes
+                if (duration < 30) {
+
+                    $('#validationMessage')
+                        .removeClass('d-none')
+                        .text('Minimum appointment duration is 30 minutes.');
+
+                    return;
+                }
+
+                // Must be multiple of 30
+                if (duration % 30 !== 0) {
+
+                    $('#validationMessage')
+                        .removeClass('d-none')
+                        .text('Appointment must be in 30 minute intervals.');
+
+                    return;
+                }
+
+                const dateObj = new Date(startDate);
+
+                // Working hours validation
+                if (dateObj.getHours() < 9 || dateObj.getHours() >= 18) {
+
+                    $('#validationMessage')
+                        .removeClass('d-none')
+                        .text('Appointments can only be booked between 9:00 AM and 6:00 PM.');
+
+                    return;
+                }
+
+                // 30-minute slot validation
+                if (dateObj.getMinutes() % 30 !== 0) {
+
+                    $('#validationMessage')
+                        .removeClass('d-none')
+                        .text('Start time must be in 30 minute intervals.');
+
+                    return;
+                }
+
+                const requestData = {
+                    Title: title,
+                    Description: description,
+                    StartDate: startDate,
+                    Duration: duration,
+                    DoctorId: doctorId,
+                    PatientId: patientId
+                };
+
+                $.ajax({
+                    url: '/api/AppointmentApi/SaveCalendarData',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+
+                    success: function (response) {
+
+                        alert('Appointment booked successfully');
+
+                            window.location.href = '/Appointment/PatientAppointments';
+
+                    },
+
+                    error: function (xhr, status, error) {
+
+                        console.log(xhr.responseText);
+                        console.log(error);
+
+                        $('#validationMessage')
+                            .removeClass('d-none')
+                            .text('Something went wrong.');
+                    }
+                });
+
+            });
+
+        });
+    </script>
+}

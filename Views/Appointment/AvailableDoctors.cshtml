@@ -1,0 +1,110 @@
+﻿@using AppointmentManagementSystem.ViewModels.Appointments
+@model IEnumerable<DoctorViewModel>
+
+@{
+    ViewData["Title"] = "Doctors";
+}
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Our Doctors
+            </h2>
+
+            <p class="text-muted mb-0">
+                Choose a doctor and book an appointment
+            </p>
+        </div>
+
+
+    </div>
+
+    <!-- Doctors Cards -->
+    <div class="row g-4">
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var doctor in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="card  shadow-sm rounded-4 h-100 doctor-card">
+
+                        <div class="card-body text-center p-4">
+
+                            <!-- Avatar -->
+                            <div class="mx-auto mb-3 rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
+                                 style="width: 90px; height: 90px; font-size: 32px; font-weight: bold;">
+
+                                @doctor.Name.Substring(0, 1).ToUpper()
+
+                            </div>
+
+                            <!-- Doctor Name -->
+                            <h4 class="fw-bold mb-1">
+                                Dr. @doctor.Name
+                            </h4>
+
+
+                            <!-- Buttons -->
+                            <div class="d-grid gap-2">
+
+                                <a asp-controller="Appointment"
+                                   asp-action="BookAppointment"
+                                   asp-route-doctorId="@doctor.Id"
+                                   class="btn btn-primary rounded-pill">
+
+                                    <i class="bi bi-calendar-check-fill me-1"></i>
+                                    Book Appointment
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+
+                <div class="alert alert-light border text-center p-5 rounded-4">
+
+                    <i class="bi bi-person-x-fill fs-1 text-muted d-block mb-3"></i>
+
+                    <h4>No Doctors Available</h4>
+
+                    <p class="text-muted mb-0">
+                        No doctors are currently registered.
+                    </p>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<style>
+    .doctor-card {
+        transition: all 0.3s ease;
+    }
+
+        .doctor-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 1rem 2rem rgba(0,0,0,.12) !important;
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,121 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="py-5 border-bottom">
+    <div class="container">
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-7">
+                <span class="text-primary fw-semibold">
+                    Appointment Management System
+                </span>
+
+                <h1 class="display-5 fw-bold mt-3 mb-3">
+                    Simple Appointment Booking for Clinics and Hospitals
+                </h1>
+
+                <p class="text-muted fs-5 mb-4">
+                    Book appointments, manage doctors, approve visits, and organize patient schedules
+                    from one clean system.
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="p-4 border rounded-3 h-100">
+                    <div class="text-primary mb-3">
+                        <i class="bi bi-person fs-2"></i>
+                    </div>
+
+                    <h5>Patients</h5>
+                    <p class="text-muted mb-4">
+                        Search doctors, choose available time slots, and book appointments.
+                    </p>
+
+                    <a asp-controller="Accounts"
+                       asp-action="PatientLogin"
+                       class="btn btn-sm btn-primary">
+                        Login as Patient
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4 border rounded-3 h-100">
+                    <div class="text-primary mb-3">
+                        <i class="bi bi-heart-pulse fs-2"></i>
+                    </div>
+
+                    <h5>Doctors</h5>
+                    <p class="text-muted mb-4">
+                        View bookings, approve appointments, and manage daily schedules.
+                    </p>
+
+                    <a asp-controller="Accounts"
+                       asp-action="DoctorLogin"
+                       class="btn btn-outline-primary px-4">
+                        Doctor Login
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4 border rounded-3 h-100">
+                    <div class="text-primary mb-3">
+                        <i class="bi bi-shield-check fs-2"></i>
+                    </div>
+
+                    <h5>Admin</h5>
+                    <p class="text-muted mb-4">
+                        Manage users, doctors, roles, and appointment records.
+                    </p>
+
+                    <a asp-controller="Accounts"
+                       asp-action="Login"
+                       class="btn btn-outline-secondary px-4">
+                        Admin Login
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light border-top">
+    <div class="container">
+        <div class="row text-center g-4">
+
+            <div class="col-md-3 col-6">
+                <h4 class="fw-bold text-primary">Easy</h4>
+                <p class="text-muted mb-0">Booking</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <h4 class="fw-bold text-primary">Secure</h4>
+                <p class="text-muted mb-0">Role Access</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <h4 class="fw-bold text-primary">Fast</h4>
+                <p class="text-muted mb-0">Approval</p>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <h4 class="fw-bold text-primary">Clean</h4>
+                <p class="text-muted mb-0">Dashboard</p>
+            </div>
+
+        </div>
+    </div>
+</section>

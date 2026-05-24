@@ -1,0 +1,14 @@
+﻿@using AppointmentManagementSystem.Helpers
+<div class="row">
+    <div class="container my-3">
+        @if (User.IsInRole(ConstHelper.AdminRole))
+        {
+            <div class="form-group row col-2" id="doctorList">
+                @Html.DropDownList("DoctorId", new SelectList(ViewBag.DoctorList, "Id", "Name"), new { @class = "form-control select2", @id = "DoctorId" })
+            </div>
+        }
+    </div>
+    <div id="calendar"></div>
+</div>
+
+<partial name="_AddEditViewModal" />

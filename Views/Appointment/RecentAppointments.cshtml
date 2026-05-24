@@ -1,0 +1,100 @@
+﻿@using AppointmentManagementSystem.ViewModels
+@model IEnumerable<AppointmentViewModel>
+
+@{
+    ViewData["Title"] = "Recent Appointments";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Recent Appointments</h2>
+            <p class="text-muted mb-0">Latest approved doctor appointments</p>
+        </div>
+
+        <a asp-controller="Appointment" asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> New Appointment
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Title</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Duration</th>
+                            <th class="text-center pe-4">Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-semibold">@item.Title</div>
+                                        <small class="text-muted">@item.Description</small>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info px-3 py-2">
+                                            @item.PatientName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-primary-subtle text-primary px-3 py-2">
+                                            Dr. @item.DoctorName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <small class="text-muted">@item.StartDate</small>
+                                    </td>
+
+                                    <td>
+                                        <small class="text-muted">@item.EndDate</small>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary px-3 py-2">
+                                            @item.Duration mins
+                                        </span>
+                                    </td>
+
+                                    <td class="text-center pe-4">
+                                        <span class="badge bg-success px-3 py-2">
+                                            Approved
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                                        No recent appointments found.
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

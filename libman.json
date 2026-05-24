@@ -1,0 +1,21 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "provider": "cdnjs",
+      "library": "select2@4.0.13",
+      "destination": "wwwroot/lib/select2/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "notify.js@3.0.0",
+      "destination": "wwwroot/lib/notify.js/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery-datetimepicker@2.5.20",
+      "destination": "wwwroot/lib/jquery-datetimepicker/"
+    }
+  ]
+}

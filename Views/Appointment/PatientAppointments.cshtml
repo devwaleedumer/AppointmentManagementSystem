@@ -1,0 +1,45 @@
+﻿@using AppointmentManagementSystem.ViewModels
+@using AppointmentManagementSystem.ViewModels.Appointments
+@model IEnumerable<AppointmentViewModel>
+
+@{
+    ViewData["Title"] = "My Appointments";
+}
+<div>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Doctor</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Status</th>
+                 <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+           @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.DoctorName</td>
+                    <td>@item.StartDate</td>
+                    <td>@item.EndDate</td>
+                    <td>@item.AppointmentStatus</td>
+                    <td>
+                        @if (item.IsDoctorApproved == 0)
+                        {
+                            <a id="cancelButton" asp-action="CancelAppointment"  asp-route-appointmentId="@item.Id"  class="btn btn-sm btn-outline-danger">Cancel</a>
+                        }
+                        else
+                        {
+                            <span> No Action Available</span>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

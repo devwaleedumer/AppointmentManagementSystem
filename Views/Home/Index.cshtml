@@ -1,0 +1,22 @@
+﻿@model dynamic
+@using AppointmentManagementSystem.Helpers
+@{
+    ViewData["Title"] = "Home";
+}
+
+@if (!User.Identity?.IsAuthenticated ?? true)
+{
+    <partial name="_LandingPage" />
+}
+else if (User.IsInRole(ConstHelper.AdminRole))
+{
+    <partial name="_AdminDashboard" />
+}
+else if (User.IsInRole(ConstHelper.DoctorRole))
+{
+    <partial name="_DoctorDashboard" />
+}
+else if (User.IsInRole(ConstHelper.PatientRole))
+{
+    <partial name="_PatientDashboard" />
+}

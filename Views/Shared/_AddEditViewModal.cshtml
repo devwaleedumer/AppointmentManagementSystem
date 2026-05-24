@@ -1,0 +1,64 @@
+﻿@using System.Security.Claims
+@using AppointmentManagementSystem.Helpers
+<div class="modal fade" id="appointmentModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal content goes here -->
+            <div class="modal-header">
+                <h4 class="modal-title">Add/Edit Appointment</h4>
+            </div>
+            <div class="modal-body">
+                <form id="appointmentForm" onsubmit="onSubmitForm(event)">
+                    @if (User.IsInRole(ConstHelper.DoctorRole))
+                        {
+                        <input type="text" value="@User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value" id="hiddenDoctorId" hidden class="form-control" />
+                        }
+                    <input type="text" id="id" name="id" hidden class="form-control" />
+                         <div>
+                        <label for="Title" class="form-label">Title</label>
+                        <input type="text" id="Title" name="Title" class="form-control" required />
+                    </div>
+                    <div>
+                        <label for="Description" class="form-label">Description</label>
+                        <textarea id="Description" name="Description" class="form-control"></textarea>
+                     </div>
+                     <div>
+                         <label class="form-label">Patient</label>
+                        @Html.DropDownList("PatientId", new SelectList(ViewBag.PatientList, "Id", "Name"), "Select Patient", new { @class = "form-control select2" , @id = "PatientId" })
+                     </div>
+                    <div>
+                        <label for="StartDate" class="form-label">StartDate</label>
+                        <input type="datetime-local" id="StartDate" name="StartDate" class="form-control" required />
+                    </div>
+
+                     <div>
+                        <label class="form-label">Duration</label>
+                        @Html.DropDownList("DurationId", new SelectList(ViewBag.Durations, "Value", "Text"), "Select Duration", new { @class = "form-control select2" , @id = "Duration" })
+                    </div>
+
+                    <span class="btn btn-sm my-4" id="status"></span>
+
+                    <div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="onModelClose()">Close</button>
+                        @if (User.IsInRole(ConstHelper.AdminRole))
+                        {
+                            <button type="button" id="deleteButton" class="btn btn-danger" onclick="DeleteAppointment()">Delete</button>
+                        }
+                        @if (User.IsInRole(ConstHelper.DoctorRole))
+                        {
+                            <button type="button" id="cancelButton" class="btn btn-warning" onclick="CancelAppointment()">Cancel</button>
+                            <button type="button" id="acceptButton" class="btn btn-success" onclick="AcceptAppointment()">Accept</button>
+
+                        }
+                        
+                        <button type="submit"    class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+            
+    </div>
+</div>
+</div>
