@@ -9,29 +9,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AppointmentManagementSystem
 {
+    /// <summary>
+    /// Application entry point. Configures Identity cookie auth, EF Core, Hangfire, and MVC routing.
+    /// </summary>
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
-                            
-            builder.Services.AddDbContext<Data.AppointmentManagementSystemDbContext>(options =>
-                            options.
-                            UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // SQL Server + EF Core for Identity users and appointments.
+            builder.Services.AddDbContext<AppointmentManagementSystemDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Hangfire uses the same database for background jobs (emails, reminders).
             builder.Services.AddHangfire(config =>
             {
                 config.UseSqlServerStorage(
                     builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
-
             builder.Services.AddHangfireServer();
-            // Identity configuration for lockout settings
+
+            // Cookie-based authentication. Lockout is strict: one failed attempt triggers a 5-minute lockout.
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Lockout.MaxFailedAccessAttempts = 1;
@@ -40,19 +41,29 @@ namespace AppointmentManagementSystem
             })
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<AppointmentManagementSystemDbContext>();
-            
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Accounts/Login";
+                options.AccessDeniedPath = "/Accounts/AccessDenied";
+                options.SlidingExpiration = true;
+                options.ExpireTimeSpan = TimeSpan.FromHours(8);
+            });
+
+            builder.Services.AddAuthorization();
+
             builder.Services.AddTransient<IAppointmentService, AppointmentService>();
             builder.Services.Configure<MailjetSettings>(
-    builder.Configuration.GetSection("MailJetSettings"));
-
+                builder.Configuration.GetSection("MailJetSettings"));
             builder.Services.AddScoped<IEmailService, MailjetEmailService>();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            await IdentityDataSeeder.SeedRolesAsync(app.Services);
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -60,15 +71,20 @@ namespace AppointmentManagementSystem
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHangfireDashboard("/hangfire");
+            // Restrict Hangfire dashboard to admins in non-development environments.
+            app.UseHangfireDashboard("/hangfire", new Hangfire.DashboardOptions
+            {
+                Authorization = [new HangfireAdminAuthorizationFilter()]
+            });
 
             app.MapStaticAssets();
+            app.MapControllers();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

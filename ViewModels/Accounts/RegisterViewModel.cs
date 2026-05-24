@@ -7,12 +7,12 @@ namespace AppointmentManagementSystem.ViewModels.Accounts
         [Required]
         public string Name { get; set; }
 
-        [Required,EmailAddress]
+        [Required, EmailAddress]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [StringLength(16,ErrorMessage = "Password must be between 6 and 16 characters", MinimumLength = 6)] 
+        [StringLength(16, ErrorMessage = "Password must be between 6 and 16 characters", MinimumLength = 6)]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]

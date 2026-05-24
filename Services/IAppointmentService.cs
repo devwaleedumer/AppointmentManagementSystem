@@ -3,11 +3,17 @@ using AppointmentManagementSystem.ViewModels.Appointments;
 
 namespace AppointmentManagementSystem.Services
 {
+    /// <summary>
+    /// Appointment and dashboard data access used by MVC controllers and the calendar API.
+    /// </summary>
     public interface IAppointmentService
     {
         Task<IEnumerable<DoctorViewModel>> GetAllDoctors();
         Task<IEnumerable<PatientViewModel>> GetAllPatients();
+
+        /// <summary>Returns 1 if updated, 2 if created.</summary>
         Task<int> AddOrUpdatePatient(AppointmentViewModel model);
+
         Task<IEnumerable<AppointmentViewModel>> DoctorEventsById(string doctorId);
         Task<IEnumerable<AppointmentViewModel>> PatientsEventById(string patientId);
         Task<AppointmentViewModel> GetById(int id);
@@ -25,7 +31,5 @@ namespace AppointmentManagementSystem.Services
         Task<int> GetUpcomingAppointmentsByDoctorId(string doctorId);
         Task<int> GetApprovedAppointmentsByDoctorId(string doctorId);
         Task<int> GetCancelledAppointmentsByDoctorId(string doctorId);
-
-
     }
 }

@@ -7,6 +7,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppointmentManagementSystem.Services.Email
 {
+    /// <summary>
+    /// Sends HTML email through Mailjet. Invoked directly or via Hangfire background jobs.
+    /// </summary>
     public class MailjetEmailService : IEmailService
     {
         private readonly MailjetSettings _settings;

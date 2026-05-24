@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentManagementSystem.Controllers
 {
+    /// <summary>
+    /// MVC account flows: registration, role-specific login, doctor onboarding, and sign-out.
+    /// Authentication uses ASP.NET Identity cookie sessions (not JWT).
+    /// </summary>
+    [Authorize]
     public class AccountsController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -36,12 +41,14 @@ namespace AppointmentManagementSystem.Controllers
             _appointmentService = appointmentService;
         }
 
-        public IActionResult Index()
+        /// <summary>Shown when the user is authenticated but lacks the required role.</summary>
+        [HttpGet]
+        public IActionResult AccessDenied()
         {
             return View();
         }
 
-        // GET: Accounts/Login
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
@@ -58,12 +65,13 @@ namespace AppointmentManagementSystem.Controllers
         }
 
 
+        [Authorize(Roles = ConstHelper.AdminRole)]
         public IActionResult CreateDoctor()
         {
             return View();
         }
 
-
+        [Authorize(Roles = ConstHelper.AdminRole)]
         public async Task<IActionResult> Doctors()
         {
             var doctor = await _appointmentService.GetAllDoctors();
@@ -71,9 +79,13 @@ namespace AppointmentManagementSystem.Controllers
         }
 
 
-  
 
-        [Authorize( Roles = "Admin")]
+
+        /// <summary>
+        /// Admin-only: creates a doctor with a generated password and sends an email verification link.
+        /// Uses a DB transaction so user + role assignment rolls back together on failure.
+        /// </summary>
+        [Authorize(Roles = ConstHelper.AdminRole)]
         [HttpPost]
         public async Task<IActionResult> CreateDoctor(DoctorAddViewModel model)
         {
@@ -134,7 +146,7 @@ namespace AppointmentManagementSystem.Controllers
                                             Request.Scheme
                                         );
 
-                         var body = $"""
+                var body = $"""
                                         <h2>Email Verification</h2>
                                         <p>Please click the link below to verify your email:</p>
                                         <p> Default Password: {password} </p?
@@ -145,7 +157,7 @@ namespace AppointmentManagementSystem.Controllers
                                         Please ignore this email if you did not create an account with us.
                                         """;
 
-                BackgroundJob.Enqueue( () =>  _emailService.SendEmailAsync(
+                BackgroundJob.Enqueue(() => _emailService.SendEmailAsync(
                     user.Email!,
                     user.Name,
                     "Verify Your Email", body));
@@ -161,7 +173,8 @@ namespace AppointmentManagementSystem.Controllers
             }
         }
 
-       
+
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyEmail(string email, string token)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
@@ -198,15 +211,20 @@ namespace AppointmentManagementSystem.Controllers
 
 
 
+        [AllowAnonymous]
         public IActionResult PatientLogin()
         {
             return View();
         }
+
+        [AllowAnonymous]
         public IActionResult DoctorLogin()
         {
             return View();
         }
 
+        /// <summary>Patient portal login. Enforces Patient role and standard lockout rules.</summary>
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> PatientLogin(PatientLoginViewModel model)
         {
@@ -217,7 +235,7 @@ namespace AppointmentManagementSystem.Controllers
 
             var foundUser = await _userManager.FindByEmailAsync(model.Email);
 
-            if (foundUser is null) 
+            if (foundUser is null)
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
@@ -251,6 +269,10 @@ namespace AppointmentManagementSystem.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+        /// <summary>
+        /// Doctor portal login. Wrong role or prior lockout triggers permanent lockout flag and notification email.
+        /// </summary>
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> DoctorLogin(LoginViewModel model)
         {
@@ -282,6 +304,7 @@ namespace AppointmentManagementSystem.Controllers
                 return View(model);
             }
 
+            // Non-doctors attempting doctor login are treated as suspicious and locked.
             if (!(await _userManager.IsInRoleAsync(foundUser, ConstHelper.DoctorRole)))
             {
                 await _userManager.SetLockoutEnabledAsync(foundUser, true);
@@ -301,6 +324,8 @@ namespace AppointmentManagementSystem.Controllers
         }
 
 
+        /// <summary>Admin login. Any authenticated Identity user may sign in (role not enforced here).</summary>
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -309,7 +334,7 @@ namespace AppointmentManagementSystem.Controllers
                 return View(model);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email , model.Password, model.RememberMe, lockoutOnFailure: true);
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
@@ -342,16 +367,19 @@ namespace AppointmentManagementSystem.Controllers
 
 
 
+        [Authorize(Roles = ConstHelper.AdminRole)]
         public IActionResult Register()
         {
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult RegisterPatient()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> RegisterPatient(RegisterViewModel model)
         {
@@ -399,6 +427,13 @@ namespace AppointmentManagementSystem.Controllers
         }
 
 
+        [Authorize(Roles = ConstHelper.AdminRole)]
+        [HttpPost]
+        [ActionName("Register")]
+        public Task<IActionResult> Register(RegisterViewModel model) =>
+            RegisterAdminAsync(model);
+
+        [Authorize(Roles = ConstHelper.AdminRole)]
         [HttpPost]
         public async Task<IActionResult> RegisterAdminAsync(RegisterViewModel model)
         {

@@ -10,6 +10,9 @@ using System.Numerics;
 
 namespace AppointmentManagementSystem.Services
 {
+    /// <summary>
+    /// Appointment CRUD, dashboard metrics, and Hangfire-scheduled patient notifications.
+    /// </summary>
     public class AppointmentService : IAppointmentService
     {
         private readonly AppointmentManagementSystemDbContext _db;
@@ -25,9 +28,9 @@ namespace AppointmentManagementSystem.Services
         public async Task<int> GetTotalAppointmentsByDoctorId(string doctorId) => await _db.Appointments.CountAsync(app => app.DoctorId == doctorId);
         public async Task<int> GetUpcomingAppointmentsByPatientId(string patientId) => await _db.Appointments.CountAsync(app => app.PatientId == patientId && app.StartDate > DateTime.Now);
         public async Task<int> GetUpcomingAppointmentsByDoctorId(string doctorId) => await _db.Appointments.CountAsync(app => app.DoctorId == doctorId && app.StartDate > DateTime.Now);
-        public async Task<int> GetApprovedAppointmentsByPatientId(string patientId) => await _db.Appointments.CountAsync(app => app.PatientId == patientId && app.IsDoctorApproved == 1);
-        public async Task<int> GetApprovedAppointmentsByDoctorId(string doctorId) => await _db.Appointments.CountAsync(app => app.DoctorId == doctorId && app.IsDoctorApproved == 1);
-        public async Task<int> GetCancelledAppointmentsByDoctorId(string doctorId) => await _db.Appointments.CountAsync(app => app.DoctorId == doctorId && app.IsDoctorApproved == -1);
+        public async Task<int> GetApprovedAppointmentsByPatientId(string patientId) => await _db.Appointments.CountAsync(app => app.PatientId == patientId && app.IsDoctorApproved == ConstHelper.AppointmentApproved);
+        public async Task<int> GetApprovedAppointmentsByDoctorId(string doctorId) => await _db.Appointments.CountAsync(app => app.DoctorId == doctorId && app.IsDoctorApproved == ConstHelper.AppointmentApproved);
+        public async Task<int> GetCancelledAppointmentsByDoctorId(string doctorId) => await _db.Appointments.CountAsync(app => app.DoctorId == doctorId && app.IsDoctorApproved == ConstHelper.AppointmentCancelled);
         
         public async Task<IEnumerable<AppointmentViewModel>> GetRecentAppointmentsByDoctorId(string doctorId)
         {
@@ -76,7 +79,7 @@ namespace AppointmentManagementSystem.Services
                 return false;
             }
 
-            appointment.IsDoctorApproved = -1; // Assuming -1 indicates cancellation 
+            appointment.IsDoctorApproved = ConstHelper.AppointmentCancelled;
             _db.Appointments.Update(appointment);
             await _db.SaveChangesAsync();
 
@@ -86,7 +89,7 @@ namespace AppointmentManagementSystem.Services
                 patient.Name,
                 "Appointment Cancelled",
                 $"Your appointment titled '{appointment.Title}' scheduled at {appointment.StartDate:yyyy-MM-dd HH:mm:ss} has been cancelled."
-            ), TimeSpan.FromSeconds(10)); // Send email after 10 seconds for demonstration
+            ), TimeSpan.FromSeconds(10));
             return true;
         }
 
@@ -98,7 +101,7 @@ namespace AppointmentManagementSystem.Services
                 return false;
             }
 
-            appointment.IsDoctorApproved = 1; // Assuming 1 indicates acceptance
+            appointment.IsDoctorApproved = ConstHelper.AppointmentApproved;
             _db.Appointments.Update(appointment);
             await _db.SaveChangesAsync();
             var patient = await _db.Users.FindAsync(appointment.PatientId);
@@ -111,6 +114,8 @@ namespace AppointmentManagementSystem.Services
             return true;
         }
 
+        /// <inheritdoc />
+        /// <returns>1 when updated, 2 when created, 0 when not found (delete path uses separate method).</returns>
         public async Task<int> AddOrUpdatePatient(AppointmentViewModel model)
         {
             var startDate = DateTime.Parse(model.StartDate);
@@ -130,11 +135,10 @@ namespace AppointmentManagementSystem.Services
 
                 _db.Appointments.Update(existingAppointment);
                 await _db.SaveChangesAsync();
-                return 1;
+                return 1; // Updated
             }
             else
             {
-               
                 Appointment app = new Appointment
                 {
                     Description = model.Description,
@@ -144,13 +148,14 @@ namespace AppointmentManagementSystem.Services
                     Duration = model.Duration,
                     DoctorId = model.DoctorId,
                     PatientId = model.PatientId,
-                    IsDoctorApproved = 0,
+                    IsDoctorApproved = ConstHelper.AppointmentPending,
                     AdminId = model.AdminId
                 };
 
                 await _db.Appointments.AddAsync(app);
                 await _db.SaveChangesAsync();
 
+                // Schedule reminder one minute before start (demo timing; adjust for production).
                 var reminderTime = app.StartDate.AddMinutes(-1);
                 var user = await _db.Users.FindAsync(app.PatientId);
                 if (reminderTime > DateTime.Now)
@@ -164,7 +169,7 @@ namespace AppointmentManagementSystem.Services
                         reminderTime
                     );
                 }
-                return 2;
+                return 2; // Created
             }
         }
 

@@ -11,6 +11,9 @@ using System.Security.Claims;
 
 namespace AppointmentManagementSystem.Controllers
 {
+    /// <summary>
+    /// Landing page for guests; role-specific dashboards for authenticated users.
+    /// </summary>
     public class HomeController : Controller
     {
         private readonly IAppointmentService _appointmentService;
@@ -24,10 +27,12 @@ namespace AppointmentManagementSystem.Controllers
         {
             if (!User.Identity?.IsAuthenticated ?? true)
             {
-                return View();
+                return View(); // _LandingPage partial
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Each role gets a different dashboard view bound to its own view model.
             if (User.IsInRole(ConstHelper.PatientRole))
             {
                 var patientDashboardViewModel = new PatientDashboardViewModel();

@@ -2,10 +2,7 @@
 {
     <li class="nav-item dropdown">
 
-        <a class="nav-link dropdown-toggle text-dark"
-           href="#"
-           role="button"
-           data-bs-toggle="dropdown">
+        <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
 
             <i class="bi bi-person-circle"></i>
             @User.Identity?.Name
@@ -14,13 +11,9 @@
         <ul class="dropdown-menu dropdown-menu-end">
 
             <li>
-                <form method="post"
-                      asp-controller="Accounts"
+                <form method="post" asp-controller="Accounts" asp-action="Logout">
 
-                      asp-action="Logout">
-
-                    <button type="submit"
-                            class="dropdown-item text-danger">
+                    <button type="submit" class="dropdown-item text-danger">
                         <i class="bi bi-box-arrow-right"></i>
                         Logout
                     </button>
@@ -38,10 +31,7 @@ else
         <!-- Login Dropdown -->
         <li class="nav-item dropdown">
 
-            <a class="nav-link dropdown-toggle text-dark"
-               href="#"
-               role="button"
-               data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
 
                 <i class="bi bi-box-arrow-in-right"></i>
                 Login
@@ -50,9 +40,7 @@ else
             <ul class="dropdown-menu dropdown-menu-end">
 
                 <li>
-                    <a class="dropdown-item"
-                       asp-controller="Accounts"
-                       asp-action="PatientLogin">
+                    <a class="dropdown-item" asp-controller="Accounts" asp-action="PatientLogin">
 
                         <i class="bi bi-person"></i>
                         Patient Login
@@ -60,10 +48,7 @@ else
                 </li>
 
                 <li>
-                    <a class="dropdown-item"
-                       asp-controller="Accounts"
-                       asp-action="DoctorLogin"
-                    >
+                    <a class="dropdown-item" asp-controller="Accounts" asp-action="DoctorLogin">
 
                         <i class="bi bi-heart-pulse"></i>
                         Doctor Login
@@ -71,10 +56,7 @@ else
                 </li>
 
                 <li>
-                    <a class="dropdown-item"
-                       asp-controller="Accounts"
-                       asp-action="Login"
-                       asp-route-role="Admin">
+                    <a class="dropdown-item" asp-controller="Accounts" asp-action="Login" asp-route-role="Admin">
 
                         <i class="bi bi-shield-lock"></i>
                         Admin Login
@@ -87,10 +69,7 @@ else
         <!-- Register Dropdown -->
         <li class="nav-item dropdown">
 
-            <a class="nav-link dropdown-toggle text-dark"
-               href="#"
-               role="button"
-               data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
 
                 <i class="bi bi-person-plus"></i>
                 Register
@@ -99,9 +78,7 @@ else
             <ul class="dropdown-menu dropdown-menu-end">
 
                 <li>
-                    <a class="dropdown-item"
-                       asp-controller="Accounts"
-                       asp-action="PatientRegister">
+                    <a class="dropdown-item" asp-controller="Accounts" asp-action="PatientRegister">
 
                         <i class="bi bi-person"></i>
                         Patient Register
@@ -109,9 +86,7 @@ else
                 </li>
 
                 <li>
-                    <a class="dropdown-item"
-                       asp-controller="Accounts"
-                       asp-action="Register">
+                    <a class="dropdown-item" asp-controller="Accounts" asp-action="Register">
 
                         <i class="bi bi-shield-lock"></i>
                         Admin Register
