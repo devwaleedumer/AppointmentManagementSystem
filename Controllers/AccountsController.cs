@@ -233,6 +233,18 @@ namespace AppointmentManagementSystem.Controllers
 
             if (!result.Succeeded)
             {
+                if (result.IsLockedOut)
+                {
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    BackgroundJob.Enqueue(
+                        () => _emailService.SendEmailAsync(
+                            model.Email,
+                            user.Name,
+                            "Account Locked",
+                            "Your account has been locked due to multiple failed login attempts. If this wasn't you, please contact support immediately."
+                        )
+                    );
+                }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return View(model);
             }
@@ -259,6 +271,14 @@ namespace AppointmentManagementSystem.Controllers
             if (foundUser.LockoutEnabled)
             {
                 ModelState.AddModelError(string.Empty, "Suspicious activity detected. Your account has been locked.");
+                BackgroundJob.Enqueue(
+                    () => _emailService.SendEmailAsync(
+                        foundUser.Email!,
+                        foundUser.Name,
+                        "Account Locked",
+                        "Your account has been locked due to suspicious activity. If this wasn't you, please contact support immediately."
+                    )
+                );
                 return View(model);
             }
 
@@ -289,12 +309,21 @@ namespace AppointmentManagementSystem.Controllers
                 return View(model);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email , model.Password, model.RememberMe, lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(model.Email , model.Password, model.RememberMe, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
                 if (result.IsLockedOut)
                 {
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    BackgroundJob.Enqueue(
+                        () => _emailService.SendEmailAsync(
+                            model.Email,
+                            user.Name,
+                            "Suspicious Login Attempt",
+                            "Your account has been locked due to multiple failed login attempts. If this wasn't you, please contact support immediately."
+                        )
+                    );
                     ViewBag.ErrorMessage = "Account Locked out due to 2 consective failed attemps";
                 }
                 else if (result.IsNotAllowed)
@@ -357,6 +386,14 @@ namespace AppointmentManagementSystem.Controllers
 
                 return View(model);
             }
+            BackgroundJob.Enqueue(
+                () => _emailService.SendEmailAsync(
+                    user.Email!,
+                    user.Name,
+                    "Welcome to Appointment Management System",
+                    "Your patient account has been successfully created. You can now log in with your credentials."
+                )
+            );
 
             return RedirectToAction(nameof(Index), controllerName: "Home");
         }
@@ -396,7 +433,14 @@ namespace AppointmentManagementSystem.Controllers
 
                 return View(model);
             }
-
+            BackgroundJob.Enqueue(
+                () => _emailService.SendEmailAsync(
+                    user.Email!,
+                    user.Name,
+                    "Admin Account Created",
+                    "Your admin account has been successfully created. You can now log in with your credentials."
+                )
+            );
             return RedirectToAction(nameof(Index), controllerName: "Home");
         }
     }

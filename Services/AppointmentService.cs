@@ -79,6 +79,14 @@ namespace AppointmentManagementSystem.Services
             appointment.IsDoctorApproved = -1; // Assuming -1 indicates cancellation 
             _db.Appointments.Update(appointment);
             await _db.SaveChangesAsync();
+
+            var patient = await _db.Users.FindAsync(appointment.PatientId);
+            BackgroundJob.Schedule(() => _emailService.SendEmailAsync(
+                patient.Email,
+                patient.Name,
+                "Appointment Cancelled",
+                $"Your appointment titled '{appointment.Title}' scheduled at {appointment.StartDate:yyyy-MM-dd HH:mm:ss} has been cancelled."
+            ), TimeSpan.FromSeconds(10)); // Send email after 10 seconds for demonstration
             return true;
         }
 
@@ -93,6 +101,13 @@ namespace AppointmentManagementSystem.Services
             appointment.IsDoctorApproved = 1; // Assuming 1 indicates acceptance
             _db.Appointments.Update(appointment);
             await _db.SaveChangesAsync();
+            var patient = await _db.Users.FindAsync(appointment.PatientId);
+            BackgroundJob.Schedule(() => _emailService.SendEmailAsync(
+                patient.Email,
+                patient.Name,
+                "Appointment Approved",
+                $"Your appointment titled '{appointment.Title}' scheduled at {appointment.StartDate:yyyy-MM-dd HH:mm:ss} has been approved by the doctor."
+            ), TimeSpan.FromSeconds(10)); 
             return true;
         }
 
